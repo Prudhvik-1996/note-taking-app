@@ -27,6 +27,8 @@ Out there in the market, there are a lot of apps, but either one has a lot of ad
     -   move notes to last
 5.  Build production ready app
 
+## Implementation
+
 ### Applying custom App Icon:
 I’ve studied varius resources online & understood that indorder generate the app icons manually, there is a lot of cumbersome process, & in pub.dev, I’ve found a package called flutter_launcher_icons which will do the entire process for us.
 
@@ -48,7 +50,7 @@ flutter pub run flutter_launcher_icons:main
 
 ![](https://lh6.googleusercontent.com/eG9NtmOfGgLWtnJMUHh-gRij_hECuZvj2xDNpLArG_GeRXxh9Stln4XCUPdTzb3pM7fmxfru-315Vjql0BlYzKema-ZAxKGZrW1pWLWKft_XDLKceOmK-jS8TVSrBkRyp2gYcyHYU5YVfwdeMw)
 
-#### Creating a basic Notes object:
+### Creating a basic Notes object:
 Our expected design of a notes object must contain the following parameters,
 - int id;
 - String title;
@@ -63,12 +65,12 @@ The object should look like some thing like this,
 
 - Since we want to store our data into shared_preferences for easy and fast access, we shall add `toJson` and `fromJson` factory methods to the same modal class.
 
-#### Date Store
+### Date Store
 - We want to store our notes in the shared_preferences (for now), hence there must be a Data Store class containing the CRUD methods, hence we've written a class, NotesStore which has all the CRUD static methods.
 
 ![](https://lh5.googleusercontent.com/VY6xYjqBKxfp2cSjZbtw5u-iPktiiHpdMQEotDBEhsQy1dfZIuQAhub29WGdABRXx2WhFqbTmVNF506u-LMHX4cRNqP73ekF6HUiSMEZCVlWb5IxS7HHOzpr4mlbTYgW3PyGg5aFRWZV9YXHVQ)
 
-#### Widgets
+### Widgets
 Now that we have all the necessary classes, we can concentrate on our layout.
 Our initial layout for the an individual Note in the list of notes in as below,
 
@@ -77,21 +79,20 @@ Our initial layout for the an individual Note in the list of notes in as below,
 And the design of each notes' page is
 ![](https://lh6.googleusercontent.com/7btifIuWIf9DVr2rE9Zto1tCkCQYjq47EWK18rBmm4SrFQuvvxlJrH3YQnfETNpwQPz8oKNimRTNQ8LMveL26id_3UdAWmIYt34ok85AsOF0500GZIgvfa0urscsK-9UNfDELJnkBCT5aGeFeQ)
 
-#### Screenshots of implementation:
+### Screenshots of implementation:
 
 <img src="https://lh4.googleusercontent.com/SFvKpVYvoPeERXxqzQbZTiQDu-_YzaSeCpNKJG4Xrv77KYY2GD1Xc28dzjmDYNfCt8hLcRMcHO91qlhsLKk7RCSWT5Xgc4hzckG31-5Pos0iHUCGU85yPHiwkU3BmUIMgPxMGF0LTQ1iIdTnEQ" width="320">
 
 
 <img src="https://lh5.googleusercontent.com/IyqHJLqeqxc3D4ZmhuYTJkcMNj-KfpkDxRPZG9edL2cCgCtTnuj6uvf2wjYI6U8gDd3uBRrPB2_QwE7VVwU0zReKwXakImhAX9B__wkqUidz3PlLYVw6vdgWam9TQQTv4rKssmF0QW6TasYvug" width="320">
 
-#### Next Phase: Ability to archive or delete notes
+### Next Phase: Ability to archive or delete notes
 - We want to archive or delete the notes with just a swipe, hence, introduced a new variable `status` in the Note class.
 - Also implemented a filter to show all notes or only unarchived notes.
 - Also implemented a feature to delete all notes.
-  Implementation is shown in the following gif.
 
-
-<img src="https://lh3.googleusercontent.com/XrjRdhlebDzCWWH4N0B8sRiY94XimSebZNLU-FFlM8sncRVxbYihjL5a1iBhsbCv0jLhT6gYDZ-xvAVDb62slMoOJBfQw-q343ZQFUtdk1idzO71f1bjvaQarymMllnT-_iw9NCc7PLC88FArQ" width="320">
+### Demo
+Implementation is shown in the video provided [here](https://drive.google.com/file/d/1ILdDF8HnhJkTSWgK1hFP1z2LTDl7LF6V/view?usp=sharing)
 
 You can download the apk from [here](https://drive.google.com/file/d/18caFdVW0DgvkEUNr116pFgqE0QproXO4/view?usp=sharing)
 

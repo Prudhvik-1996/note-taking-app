@@ -144,15 +144,15 @@ class _NotesPageState extends State<NotesPage> {
                                   startActionPane: ActionPane(
                                     motion: const ScrollMotion(),
                                     children: [
-                                      buildSlidableArchiveAction(e),
                                       buildSlidableDeleteAction(e),
+                                      buildSlidableArchiveAction(e),
                                     ],
                                   ),
                                   endActionPane: ActionPane(
                                     motion: const ScrollMotion(),
                                     children: [
-                                      buildSlidableDeleteAction(e),
                                       buildSlidableArchiveAction(e),
+                                      buildSlidableDeleteAction(e),
                                     ],
                                   ),
                                   child: Container(
@@ -212,7 +212,7 @@ class _NotesPageState extends State<NotesPage> {
         await NotesStore.updateNotes(eachNote);
         setState(() {});
       },
-      backgroundColor: eachNote.noteStatus == "ARCHIVED" ? Colors.blue : Colors.amber,
+      backgroundColor: eachNote.noteStatus == "ARCHIVED" ? Colors.blue : Colors.cyan,
       icon: eachNote.noteStatus == "ARCHIVED" ? Icons.archive_outlined : Icons.archive,
       label: eachNote.noteStatus == "ARCHIVED" ? "Unarchive" : 'Archive',
     );
