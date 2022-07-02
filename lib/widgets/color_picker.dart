@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 class ColorPicker extends StatefulWidget {
   final void Function(Color) callBackColorTapped;
   final Color noteColor;
+
   const ColorPicker({Key? key, @required required this.callBackColorTapped, required this.noteColor}) : super(key: key);
+
   @override
   _ColorPickerState createState() => _ColorPickerState();
 }
@@ -31,6 +33,7 @@ class _ColorPickerState extends State<ColorPicker> {
   late Color noteColor;
 
   late int indexOfCurrentColor;
+
   @override
   void initState() {
     super.initState();
@@ -57,7 +60,8 @@ class _ColorPickerState extends State<ColorPicker> {
                 ),
                 width: 38.0,
                 height: 38.0,
-                padding: const EdgeInsets.all(1.0), // border width
+                padding: const EdgeInsets.all(1.0),
+                // border width
                 decoration: BoxDecoration(
                   color: borderColor, // border color
                   shape: BoxShape.circle,

@@ -29,7 +29,7 @@ class _NotesPageState extends State<NotesPage> {
     setState(() {
       _isLoading = true;
     });
-    await NotesStore.initNotes();
+    await NotesStore.loadNotes();
     setState(() {
       _isLoading = false;
     });
@@ -97,19 +97,7 @@ class _NotesPageState extends State<NotesPage> {
                   width: 15,
                 ),
               ] +
-              <Widget>[
-                PopupMenuButton<String>(
-                  onSelected: handleMoreOptions,
-                  itemBuilder: (BuildContext context) {
-                    return {(_showOnlyUnArchived ? "Show all notes" : "Do not show archived"), 'Delete all notes'}.map((String choice) {
-                      return PopupMenuItem<String>(
-                        value: choice,
-                        child: Text(choice),
-                      );
-                    }).toList();
-                  },
-                ),
-              ],
+              buildPopUpMenuButton(),
         ),
         body: _isLoading
             ? const Center(
@@ -126,61 +114,81 @@ class _NotesPageState extends State<NotesPage> {
                 : ListView(
                     children: NotesStore.notes
                         .where((e) => _showOnlyUnArchived ? e.noteStatus != "ARCHIVED" : true)
-                        .map((e) => GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => NotePage(
-                                      noteInEditing: e.copy(),
-                                    ),
-                                  ),
-                                ).then((value) => setState(() {}));
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-                                child: Slidable(
-                                  enabled: true,
-                                  startActionPane: ActionPane(
-                                    motion: const ScrollMotion(),
-                                    children: [
-                                      buildSlidableDeleteAction(e),
-                                      buildSlidableArchiveAction(e),
-                                    ],
-                                  ),
-                                  endActionPane: ActionPane(
-                                    motion: const ScrollMotion(),
-                                    children: [
-                                      buildSlidableArchiveAction(e),
-                                      buildSlidableDeleteAction(e),
-                                    ],
-                                  ),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: e.color,
-                                    ),
-                                    child: ListTile(
-                                      title: Text(e.title ?? "-"),
-                                      subtitle: Text(e.content ?? "-"),
-                                      trailing: e.noteStatus == "ARCHIVED" ? const Icon(Icons.archive) : null,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ))
+                        .map((e) => buildEachNoteWidget(context, e))
                         .toList(),
                   ),
         floatingActionButton: FloatingActionButton(
           tooltip: 'Add New Note',
-          onPressed: () => _newNoteTapped(context),
+          onPressed: () => newNoteTappedAction(context),
           child: const Icon(Icons.add),
         ),
       ),
     );
   }
 
-  Future<void> _newNoteTapped(BuildContext context) async {
+  List<Widget> buildPopUpMenuButton() {
+    return <Widget>[
+      PopupMenuButton<String>(
+        onSelected: handleMoreOptions,
+        itemBuilder: (BuildContext context) {
+          return {(_showOnlyUnArchived ? "Show all notes" : "Do not show archived"), 'Delete all notes'}.map((String choice) {
+            return PopupMenuItem<String>(
+              value: choice,
+              child: Text(choice),
+            );
+          }).toList();
+        },
+      ),
+    ];
+  }
+
+  GestureDetector buildEachNoteWidget(BuildContext context, Note e) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NotePage(
+              noteInEditing: e.copy(),
+            ),
+          ),
+        ).then((value) => setState(() {}));
+      },
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+        child: Slidable(
+          enabled: true,
+          startActionPane: ActionPane(
+            motion: const ScrollMotion(),
+            children: [
+              buildSlidableDeleteAction(e),
+              buildSlidableArchiveAction(e),
+            ],
+          ),
+          endActionPane: ActionPane(
+            motion: const ScrollMotion(),
+            children: [
+              buildSlidableArchiveAction(e),
+              buildSlidableDeleteAction(e),
+            ],
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: e.color,
+            ),
+            child: ListTile(
+              title: Text(e.title ?? "-"),
+              subtitle: Text(e.content ?? "-"),
+              trailing: e.noteStatus == "ARCHIVED" ? const Icon(Icons.archive) : null,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> newNoteTappedAction(BuildContext context) async {
     var emptyNote = Note(
       id: -1,
       title: "",

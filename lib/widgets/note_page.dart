@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:note_taking_app/modal/note.dart';
 import 'package:note_taking_app/store/notes_store.dart';
 import 'package:note_taking_app/utils/date_time_utils.dart';
-import 'package:note_taking_app/widgets/more_options.dart';
+import 'package:note_taking_app/widgets/color_picker.dart';
 
 class NotePage extends StatefulWidget {
   final Note noteInEditing;
@@ -18,9 +18,6 @@ class NotePage extends StatefulWidget {
 class _NotePageState extends State<NotePage> {
   final _titleTextEditingController = TextEditingController();
   final _contentTextEditingController = TextEditingController();
-
-  final _titleFocus = FocusNode();
-  final _contentFocus = FocusNode();
 
   late Note _editableNote;
 
@@ -36,27 +33,20 @@ class _NotePageState extends State<NotePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_editableNote.id == -1 && (_editableNote.title ?? "").trim().isEmpty) {
-      FocusScope.of(context).requestFocus(_titleFocus);
-    }
-
-    return WillPopScope(
-      child: Scaffold(
-        key: _globalKey,
-        appBar: AppBar(
-          leading: const BackButton(),
-          actions: actionButtons(context),
-          elevation: 1,
-          backgroundColor: _editableNote.color,
-          title: _pageTitle(),
-        ),
-        body: _bodyWidget(context),
+    return Scaffold(
+      key: _globalKey,
+      appBar: AppBar(
+        leading: const BackButton(),
+        actions: actionButtons(context),
+        elevation: 1,
+        backgroundColor: _editableNote.color,
+        title: _pageTitle(),
       ),
-      onWillPop: _readyToPop,
+      body: bodyWidget(context),
     );
   }
 
-  Widget _bodyWidget(BuildContext context) {
+  Widget bodyWidget(BuildContext context) {
     return Container(
       color: _editableNote.color,
       padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
@@ -64,50 +54,54 @@ class _NotePageState extends State<NotePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                child: EditableText(
-                  maxLines: null,
-                  controller: _titleTextEditingController,
-                  focusNode: _titleFocus,
-                  style: const TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
-                  cursorColor: Colors.blue,
-                  backgroundCursorColor: Colors.blue,
-                ),
-              ),
-            ),
-            const Divider(),
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                child: EditableText(
-                  maxLines: 300,
-                  controller: _contentTextEditingController,
-                  focusNode: _contentFocus,
-                  style: const TextStyle(color: Colors.black, fontSize: 20),
-                  backgroundCursorColor: Colors.red,
-                  cursorColor: Colors.blue,
-                ),
-              ),
-            ),
-            const Divider(),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                padding: const EdgeInsets.all(5),
-                child: Text(
-                  "Last Updated: ${convertEpochToDDMMYYYYNHHMMAA(_editableNote.lastUpdatedMillis ?? DateTime.now().millisecondsSinceEpoch)}",
-                  textAlign: TextAlign.end,
-                ),
-              ),
-            ),
+            buildTitleTextFieldWidget(),
+            buildBodyTextFieldWidget(),
+            buildLastUpdatedTimeWidget(),
           ],
         ),
         left: true,
         right: true,
         top: false,
         bottom: false,
+      ),
+    );
+  }
+
+  Flexible buildTitleTextFieldWidget() {
+    return Flexible(
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        child: TextField(
+          maxLines: null,
+          controller: _titleTextEditingController,
+          style: const TextStyle(color: Colors.black, fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Flexible buildBodyTextFieldWidget() {
+    return Flexible(
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        child: TextField(
+          maxLines: 300,
+          controller: _contentTextEditingController,
+          style: const TextStyle(color: Colors.black, fontSize: 20),
+        ),
+      ),
+    );
+  }
+
+  Align buildLastUpdatedTimeWidget() {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Container(
+        padding: const EdgeInsets.all(5),
+        child: Text(
+          "Last Updated: ${convertEpochToDDMMYYYYNHHMMAA(_editableNote.lastUpdatedMillis ?? DateTime.now().millisecondsSinceEpoch)}",
+          textAlign: TextAlign.end,
+        ),
       ),
     );
   }
@@ -123,7 +117,7 @@ class _NotePageState extends State<NotePage> {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: InkWell(
           child: GestureDetector(
-            onTap: () => bottomSheet(context),
+            onTap: () => showBottomSheetAction(context),
             child: const Icon(
               Icons.color_lens,
             ),
@@ -134,7 +128,7 @@ class _NotePageState extends State<NotePage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: GestureDetector(
-            onTap: () => updateNoteObject(context),
+            onTap: () => updateNoteAction(context),
             child: const Icon(
               Icons.check,
             ),
@@ -145,7 +139,7 @@ class _NotePageState extends State<NotePage> {
     return actions;
   }
 
-  Future<void> updateNoteObject(BuildContext context) async {
+  Future<void> updateNoteAction(BuildContext context) async {
     _editableNote.content = _contentTextEditingController.text.trim();
     _editableNote.title = _titleTextEditingController.text.trim();
 
@@ -161,18 +155,30 @@ class _NotePageState extends State<NotePage> {
     }
   }
 
-  Future<bool> _readyToPop() async {
-    return true;
-  }
-
-  void bottomSheet(BuildContext context) {
+  void showBottomSheetAction(BuildContext context) {
+    FocusManager.instance.primaryFocus?.unfocus();
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return MoreOptionsSheet(
+        return Container(
           color: widget.noteInEditing.color,
-          callBackColorTapped: _changeColor,
-          dateLastEdited: _editableNote.lastUpdatedDate,
+          child: Wrap(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: SizedBox(
+                  height: 44,
+                  width: MediaQuery.of(context).size.width,
+                  child: ColorPicker(
+                    callBackColorTapped: _changeColor,
+                    // call callBack from notePage here
+                    noteColor: widget.noteInEditing.color, // take color from local variable
+                  ),
+                ),
+              ),
+              const ListTile()
+            ],
+          ),
         );
       },
     );

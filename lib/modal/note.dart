@@ -52,4 +52,14 @@ class Note {
   Note copy() {
     return Note.fromJson(toJson());
   }
+
+  @override
+  int get hashCode {
+    return id ?? 0;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return hashCode == other.hashCode;
+  }
 }

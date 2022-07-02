@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class NotesStore {
   static List<Note> notes = [];
 
-  static Future<void> initNotes() async {
+  static Future<void> loadNotes() async {
     await getAllNotes();
   }
 
@@ -36,14 +36,14 @@ class NotesStore {
 
   static Future<void> updateNotes(Note note) async {
     debugPrint("Updating notes: ${json.encode(note.toJson())}");
-    notes.removeWhere((e) => e.id == note.id);
+    notes.remove(note);
     notes.add(note);
     await saveNotes();
   }
 
   static Future<void> deleteNotes(Note note) async {
     debugPrint("Deleting notes: ${json.encode(note.toJson())}");
-    notes.removeWhere((e) => e.id == note.id);
+    notes.remove(note);
     await saveNotes();
   }
 
@@ -57,6 +57,6 @@ class NotesStore {
     String notesJson = json.encode(notes.map((e) => e.toJson()).toList());
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('notes', notesJson);
-    await initNotes();
+    await loadNotes();
   }
 }
